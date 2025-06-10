@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import {ImSearch} from 'react-icons/im'
+import { toast } from 'react-toastify';
 
 export class PokemonForm extends Component {
   state = {
@@ -11,7 +13,11 @@ export class PokemonForm extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    this.props.onSubmit(this.state.pokemonName);
+    if(this.state.pokemonName.trim() === ''){
+        toast.error("Write name!");
+        return;
+    }
+    this.props.onSub(this.state.pokemonName);
     this.setState({ pokemonName: '' });
   };
 
@@ -24,7 +30,9 @@ export class PokemonForm extends Component {
           value={this.state.pokemonName}
           onChange={this.handleNameChange}
         />
-        <button type="submit">Find</button>
+        <button type="submit">
+        <ImSearch style={{marginRight: 8}}/>
+        Find</button>
       </form>
     );
   }
