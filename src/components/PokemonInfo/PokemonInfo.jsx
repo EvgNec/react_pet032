@@ -4,13 +4,21 @@ export class PokemonInfo extends Component {
   state = {
     pokemon: null,
     loading: false,
+    error: null,
+    status: 'idle',
   };
+  // state: 'idle' - очикує (нічого не робе)
+  //       'pending' - очикується виконання
+  //       'resolved' - виконано
+  //       'rejected' - відмова
 
   componentDidUpdate(prevProps, prevState) {
     const prevName = prevProps.name;
     const nextName = this.props.name;
+
     if (prevName !== nextName) {
-      this.setState({ loading: true });
+      this.setState({ status: 'pending'});
+
       fetch(`https://pokeapi.co/api/v2/pokemon/${nextName}`)
         // .then(res => res.json())
         .then(res => {
@@ -28,22 +36,28 @@ export class PokemonInfo extends Component {
   }
 
   render() {
-    const { loading, pokemon, error } = this.state;
-    const { name } = this.props;
-    return (
-      <div>
-        {error && <h1>{error.message}</h1>}
-        {loading && <div>Loading</div>}
-        {!name && <div>Input name</div>}
-        {pokemon && <div>{pokemon.name}</div>}
-        {pokemon && (
+    const {  pokemon, error, status } = this.state;
+
+    if (status === 'idle') {
+      return <div>Input name</div>;
+    }
+    if (status === 'pending') {
+      return <div>Loading</div>;
+    }
+    if (status === 'resolved') {
+      return (
+        <div>
+          <p>{pokemon.name}</p>
           <img
             src={pokemon.sprites.other[`official-artwork`].front_default}
             alt={pokemon.name}
           />
-        )}
-      </div>
-    );
+        </div>
+      );
+    }
+    if (status === 'rejected') {
+      return <h1>{error.message}</h1>;
+    }
   }
 }
 
