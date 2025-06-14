@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PokemonErrorView from './PokemonErrorView';
 import PokemonDataView from './PokemonDataView';
 import PokemonPendingView from './PokemonPendingView';
+import { fetchPokemon } from '../../service/pokemonAPI.js';
 
 export class PokemonInfo extends Component {
   state = {
@@ -21,25 +22,27 @@ export class PokemonInfo extends Component {
 
     if (prevName !== nextName) {
       this.setState({ status: 'pending' });
-      setTimeout(() => {
-        fetch(`https://pokeapi.co/api/v2/pokemon/${nextName}`)
-          .then(res => {
-            if (res.ok) {
-              return res.json();
-            }
-            return Promise.reject(
-              new Error(`Not found pokemon with name ${nextName}`)
-            );
-          })
-          .then(pokemon => this.setState({ pokemon, status: 'resolved' }))
-          .catch(error => this.setState({ error, status: 'rejected' }));
-      }, 3000);
+      fetchPokemon(nextName)
+        .then(pokemon => this.setState({ pokemon, status: 'resolved' }))
+        .catch(error => this.setState({ error, status: 'rejected' }));
+
+      // fetch(`https://pokeapi.co/api/v2/pokemon/${nextName}`)
+      //   .then(res => {
+      //     if (res.ok) {
+      //       return res.json();
+      //     }
+      //     return Promise.reject(
+      //       new Error(`Not found pokemon with name ${nextName}`)
+      //     );
+      //   })
+      //   .then(pokemon => this.setState({ pokemon, status: 'resolved' }))
+      //   .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
 
   render() {
     const { pokemon, error, status } = this.state;
-    const { name } =this.props;
+    const { name } = this.props;
 
     if (status === 'idle') {
       return <div>Input name</div>;
